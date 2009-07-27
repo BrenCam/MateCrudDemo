@@ -1,0 +1,26 @@
+<updateLog>
+	<log>
+	    <id>1</id>
+	    <recid>1</recid>
+	    <rectype>Registration</rectype>
+	    <updatetype>Add</updatetype>
+	    <user>Sys Admin</user>
+	    <date>11/25/2008 17:00</date>
+	</log>
+	<log>
+	    <id>2</id>
+	    <recid>2</recid>
+	    <rectype>Registration</rectype>
+	    <updatetype>Add</updatetype>
+	    <user>Sys Admin</user>
+	    <date>11/30/2008 13:05</date>
+	</log>
+	<log>
+	    <id>3</id>
+	    <recid>1</recid>
+	    <rectype>PSA Data</rectype>
+	    <updatetype>Add</updatetype>
+	    <user>Sys Admin</user>
+	    <date>12/1/2008 16:04</date>
+	</log>
+</updateLog>

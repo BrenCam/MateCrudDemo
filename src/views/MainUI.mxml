@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:views="views.*" 
+	xmlns:mate="http://mate.asfusion.com/" >
+
+<!--	
+	<mx:Model id="dataSet" source="data/menu.xml" />
+-->
+	
+	<mx:Script>
+		<![CDATA[
+			import events.*;
+			import views.Login;
+			import views.AppCredits;
+			import mx.controls.Alert;
+			// For search/popup			
+			import mx.managers.PopUpManager;
+			
+			//Screen Settings
+			private const MIN_MAINBODY_HEIGHT:int= 475;
+			private const MIN_MAINBODY_WIDTH:int= 900;
+			
+			//private const LOGIN:uint = 0;
+			private const PATIENT_LIST:uint = 0;
+			private const PATIENT_REGISTER:uint = 1;
+			private const PATIENT_STATUS:uint = 2;
+			private const PSA_DETAIL:uint = 3;
+			private const UPDATE_LOG:uint = 4;
+			private const ABOUT_INFO:uint = 5;
+			
+			private var popupAppCredits:AppCredits;
+			
+			
+            [Bindable]
+            public var selectedNode:XML;
+            
+            import mx.collections.ICollectionView;
+            import mx.events.ListEvent;
+        	import mx.collections.XMLListCollection;            
+
+            //[Bindable]
+            //public var selectedIndex:int;					// Handle/Synch with the tree control (?? via Bind Setter??)
+            												// Inject value when patient selected
+            												
+            //Menu Index Value is set via injector            
+            public function set setMenuIndex(index:int):void{            	
+            		//menuTree.selectedIndex = 8;
+            		//menuTree.selectedIndex = index;				
+				}
+                        												
+            private function initTree():void {
+            	menuTree.validateNow();
+            	menuTree.expandItem(dataSet,true);
+           		var nodeList:XMLListCollection = menuTree.dataProvider as XMLListCollection;
+	            var nodes:XMLList = nodeList.source;
+	            expandSubNodes(nodes);
+				//Navigate to Info/About Form on Open	            
+				var event:NavigationEvent= new NavigationEvent(NavigationEvent.ABOUT_INFO);					
+				this.dispatchEvent(event);
+            	menuTree.selectedIndex = 8;
+            }
+
+            private function initApp():void
+	        {
+	            var nodeList:XMLListCollection = menuTree.dataProvider as XMLListCollection;
+	            var nodes:XMLList = nodeList.source;
+	            expandSubNodes(nodes);
+	            
+	        }
+       
+	        private function expandSubNodes(nodes:XMLList):void
+	        {
+	            for(var i:int = 0 ; i < nodes.length() ; i++)
+	            {
+	                var n:XML = nodes[i];
+	                if(n.children() != null)
+	                {
+	                    menuTree.expandItem(n,true,false);
+	                    expandSubNodes(n.children());
+	                }
+	                else
+	                {
+	                    break;
+	                }
+	            }           
+	        }
+  
+            private function tree_itemClick(evt:ListEvent):void {
+                var item:Object = Tree(evt.currentTarget).selectedItem;
+                if (menuTree.dataDescriptor.isBranch(item)) {
+                    menuTree.expandItem(item, !menuTree.isItemOpen(item), true);
+                }
+            }
+  
+            private function tree_labelFunc(item:XML):String {
+                var children:ICollectionView;
+                var suffix:String = "";
+                if (menuTree.dataDescriptor.isBranch(item)) {
+                    children = menuTree.dataDescriptor.getChildren(item);
+                    suffix = " (" + children.length + ")";
+                }
+                return item[menuTree.labelField] + suffix;
+            }
+
+            // Event handler for the Tree control change event.
+            public function treeChanged(event:Event):void {
+                selectedNode=Tree(event.target).selectedItem as XML;
+                var strSeln:String = selectedNode.@label;
+                //Alert.show('Selected Item: ' + selectedNode.@label);
+                //Alert.show ('Selected Index: ' + menuTree.selectedIndex.toString());
+                
+                switch (strSeln) {
+                	case "Patient List":
+		                viewStack.selectedIndex = PATIENT_LIST;
+						break;
+ 
+                	case "Registration":
+		                viewStack.selectedIndex = PATIENT_REGISTER;
+						break;
+						
+                	case "Patient Status":
+		                viewStack.selectedIndex = PATIENT_STATUS;
+						break;
+						
+                	case "PSA History":
+		                viewStack.selectedIndex = PSA_DETAIL;
+						break;
+
+                	case "View Update Log":
+		                viewStack.selectedIndex = UPDATE_LOG;
+						break;
+
+                	case "About This Demo":
+		                viewStack.selectedIndex = ABOUT_INFO;
+						break;
+
+					default:
+						break;
+                }
+            }
+                // ?? Dispatch appropriate navigation event to change viewstack
+                
+				// send logout event
+				private function logoff():void 
+				{
+					var event:LoginEvent = new LoginEvent(LoginEvent.LOGOUT);					
+					this.dispatchEvent(event);
+				}
+				
+				
+				// Display Credits Popup here			
+				private function showCredits():void{
+					popupAppCredits = new AppCredits();
+					popupAppCredits.addEventListener('cancel', cancelHandler);				
+					PopUpManager.addPopUp(popupAppCredits,this,true);
+					PopUpManager.centerPopUp(popupAppCredits);
+				}
+				
+//				private function selectHandler(event:Event):void{				
+//					PopUpManager.removePopUp(popupAppCredits);
+//				} 														                
+
+				private function cancelHandler(event:Event):void{
+					PopUpManager.removePopUp(popupAppCredits);					
+				}                 
+                                
+		]]>
+	</mx:Script>
+	
+	<mx:XMLList id="dataSet" >	
+	<node label="Data Management">
+		<node label="Registration"/>
+		<node label="Patient List"/>
+		<node label="Patient Status"/>		
+		<node label="PSA History"/>		
+	</node>
+	<node label="System Administration">
+		<node label="View Update Log"/>
+	</node>
+	<node label="Info">
+		<node label="About This Demo"/>
+	</node>
+	</mx:XMLList>
+
+
+	<!-- Listeners and Dispatchers________________________________________________ -->
+	
+	<!--
+	<mate:Listener type="{NavigationEvent.LOGIN}" 			receive="viewStack.selectedIndex = LOGIN" />
+	-->
+	
+	<mate:Listener type="{NavigationEvent.PATIENT_REGISTER}" receive="viewStack.selectedIndex = PATIENT_REGISTER" />
+	<mate:Listener type="{NavigationEvent.PATIENT_LIST}" 	receive="viewStack.selectedIndex = PATIENT_LIST" />	
+	<mate:Listener type="{NavigationEvent.PATIENT_STATUS}" 	receive="viewStack.selectedIndex = PATIENT_STATUS" />
+	<mate:Listener type="{NavigationEvent.PSA_DETAIL}" 	receive="viewStack.selectedIndex = PSA_DETAIL" />
+	<mate:Listener type="{NavigationEvent.ABOUT_INFO}" 	receive="viewStack.selectedIndex = ABOUT_INFO" />
+
+
+	<!-- GUI ______________________________________________________________________ -->
+	
+		<mx:HBox styleName="mainBody"  minWidth="{MIN_MAINBODY_WIDTH}" minHeight="{MIN_MAINBODY_HEIGHT}" borderStyle="none" 
+			horizontalGap="0" borderThickness="1"
+			paddingBottom="2" paddingTop="2" paddingLeft="2" paddingRight="2">
+		<mx:Panel title="Main Menu" minHeight="{MIN_MAINBODY_HEIGHT}">
+			<mx:VBox>
+				<mx:Tree id="menuTree" dataProvider="{dataSet}" labelField="@label" labelFunction="tree_labelFunc"
+					itemClick="tree_itemClick(event);" 
+					borderStyle="none"
+					change="treeChanged(event)"  defaultLeafIcon="{null}" 
+					minWidth="175" minHeight="300" showRoot="false" 
+					creationComplete="initTree();"/>		
+					<mx:HBox >
+						<mx:Button id="Logout" label="Logout" click="logoff()" >				
+						</mx:Button>
+						<mx:Button id="Credits" label="Credits" click="showCredits()">				
+						</mx:Button>						
+					</mx:HBox>
+				</mx:VBox>			
+		</mx:Panel>
+			
+			<mx:ViewStack id="viewStack"  minHeight="{MIN_MAINBODY_HEIGHT}" minWidth="725">
+				<views:PatientList  />
+				<views:PatientDetail/>
+				<views:PatientStatus/>
+				<views:PatientPSA/>
+				<views:UpdateLog/>
+				<views:AboutInfo/>
+			</mx:ViewStack>
+		</mx:HBox>
+</mx:Canvas>

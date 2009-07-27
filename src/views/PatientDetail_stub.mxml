@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" width="100%" 
+	xmlns:vos="com.brencam.vos.*" xmlns:mate="http://mate.asfusion.com/"
+	xmlns:local="com.brencam.components.*"
+	title="Patient Registration/Data Status" >
+
+<!-- Combo Box Data - Family History Values______________________________________________________________________ -->
+		
+
+	<!-- Model ______________________________________________________________________ -->
+	
+		
+	<!-- GUI ______________________________________________________________________ -->
+	<mx:Form defaultButton="{submit}">
+		<mx:FormItem label="Patient ID:"  required="false" enabled="false">
+			<mx:TextInput id="PatientID"  />
+		</mx:FormItem>		<mx:FormItem label="First Name:"  required="true">
+			<mx:TextInput id="firstname" />
+		</mx:FormItem>
+		<mx:FormItem label="Last Name:"  required="true">
+			<mx:TextInput id="lastname" />
+		</mx:FormItem>
+		<mx:FormItem label="Date of Birth:">
+			<mx:DateField id="dob" />
+		</mx:FormItem>
+		<mx:FormItem label="Email:"  required="true">
+			<mx:TextInput id="email" />
+		</mx:FormItem>	
+		
+		<mx:FormItem direction="horizontal" label="Family History of Disease:">
+			<mx:CheckBox label="Father" id="chkfhFather"  />
+			<mx:CheckBox label="Brother" id="chkfhBrother" />
+		</mx:FormItem>
+		
+		<mx:FormItem direction="horizontal">
+			<mx:Button label="Submit Changes" id="submit" />
+			<mx:Button label="Add New"  />			
+		</mx:FormItem>
+	</mx:Form>
+	
+	<!-- Validators ______________________________________________________________________ -->
+	
+	<mx:Array id="validators">
+	    <mx:StringValidator id="vFirstname" source="{firstname}" property="text" required="true" />
+	    <mx:StringValidator id="vLastName"  source="{lastname}" property="text" required="true" />
+	    <mx:EmailValidator id="vEmail"  	source="{email}" 	property="text" required="true" />
+	</mx:Array>
+	
+</mx:Panel>

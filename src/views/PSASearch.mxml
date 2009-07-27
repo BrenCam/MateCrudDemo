@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" 
+  title="Enter Search Criteria or Select PSA From List"
+  creationComplete="getList()">
+
+  <mx:Metadata>
+    [Event(name="search", type="events.SearchEvent")]
+    [Event(name="cancel", type="flash.events.Event")]
+  </mx:Metadata>
+  
+  <mx:Script>
+    <![CDATA[
+      import mx.core.Application;
+      import mx.events.ListEvent;
+      import events.*;
+      import mx.controls.Alert;
+      import mx.rpc.http.HTTPService;
+      import mx.rpc.events.ResultEvent;
+      import mx.rpc.events.FaultEvent;
+      import mx.collections.ArrayCollection;
+      import vos.PatientPSAVO;
+      import mx.events.ItemClickEvent;
+	  private var httpSvc:HTTPService;
+
+	  [Bindable]
+	  public var myData:ArrayCollection;
+	  
+	  private var selectedName:String = "date";
+ 
+      public function getList():void {
+
+    	var httpSvc:HTTPService = new HTTPService();
+        httpSvc.url= "data/psa.xml";        	
+        httpSvc.addEventListener("result", httpResult);
+        httpSvc.addEventListener("fault", httpFault);
+        httpSvc.send();       
+    	}
+    	
+      public function psaSelected(event:ListEvent): void{
+			// Pass Selection info to main form via Custom event
+			
+			//var ptname:String = ptSum.selectedItem.lastname.toString();	  // this works						
+			//Alert.show('DataGrid Clicked - Selected Patient ' + ptname);
+
+			// Make sure a row is clicked
+			if (event.rowIndex >=0) {			
+				// Populate and Dispatch Custom Event; Exit this form 
+		        var evt:PtPSAEvent = new PtPSAEvent (PtPSAEvent.SELECT);
+				evt.patientPSA = new PatientPSAVO();		        
+		        evt.patientPSA.id = psaSum.selectedItem.id.toString();	        
+		        evt.patientPSA.ptid = psaSum.selectedItem.ptid.toString();	        
+		        evt.patientPSA.date = psaSum.selectedItem.date.toString();	        
+		        evt.patientPSA.value = psaSum.selectedItem.value.toString();	        
+		        		        
+				// Notes - 11/24/2008 - (After much testing) 
+				// 2 separate events (Update Model + Close Popup) are required here
+				// Order is important - datamodel update must occur first
+				// (otherwise the calling (detail display screen) is not updated				
+				// Event used to trigger updates to data models			
+	    	    dispatchEvent(evt);	
+	    	    // Event used to close popup
+	    	    dispatchEvent(new Event('ok')); 
+   			}				
+		}
+    	    	
+ 		public function httpResult(event:ResultEvent):void {
+ 			//Alert.show("httpResult: ");
+            //var obj:PtPSA;
+			//myData = event.result.patients.psa; //results are bound to datamodel						
+			searchField.setFocus();			
+        	return;
+        }
+       
+	  public function httpFault(event:FaultEvent):void {			
+			Alert.show("fault: "+ event.toString());		
+		}//end function faultHandler
+		
+		
+	// Code to support filtering Array Collection data	
+     public function filter():void {              
+           myData.filterFunction = filterFirst;
+           myData.refresh();            
+    	}
+    	
+     public function filterReset():void {                
+           myData.filterFunction = null;
+           myData.refresh();            
+    	}    	
+    			   
+     private function filterFirst(item:Object):Boolean {
+    	    return item[selectedName].match(new RegExp(searchField.text, 'i'))
+    	}	
+
+    private function search():void
+    {
+        if(searchField.text !='')
+        {
+            filter()
+        }
+        else
+        {
+            filterReset()
+        }
+    }   
+    
+    private function handleCard(event:ItemClickEvent):void {               
+           selectedName = event.currentTarget.selectedValue as String;                                  
+    }     	
+           
+    private function eraseText(event:MouseEvent):void    {
+        searchField.text ='';
+	    }    		
+               
+    ]]>
+  </mx:Script>
+  
+  	<mx:Canvas label="Summary" width="100%" height="100%">
+  	<mx:VBox>
+  		<mx:HBox width="100%">
+			<mx:TextInput id="searchField" width="100%" change="search()" 
+				toolTip="Filter By PSA Date or Value"
+				text="Search By Date" rollOver="eraseText(event)">				
+			</mx:TextInput>  
+	        <mx:RadioButtonGroup id="nameGroup"  itemClick="handleCard(event)"/>
+    	    <mx:RadioButton tabEnabled="true" tabIndex="2" label="date" selected="true" groupName="nameGroup"/>
+        	<mx:RadioButton tabEnabled="true" tabIndex="3" label="value"  groupName="nameGroup" />
+        	<mx:Button tabEnabled="true" tabIndex="4" click="searchField.text='';search()"   label="Reset" />									
+  		</mx:HBox> 
+  		
+		<mx:DataGrid id ="psaSum" dataProvider="{myData}" itemClick="psaSelected(event)" paddingTop="0" paddingBottom="0" height="100%" 
+			 verticalAlign="middle" >
+			<mx:columns>
+				<mx:DataGridColumn headerText="ID" dataField="id"/>
+				<mx:DataGridColumn headerText="Patient ID" dataField="ptid"/>
+				<mx:DataGridColumn headerText="PSA Date" dataField="date"/>
+				<mx:DataGridColumn headerText="PSA Value" dataField="value"/>
+			</mx:columns>
+		</mx:DataGrid>	  		
+  				
+		<mx:HBox>
+		<mx:Spacer width="33%">		
+		</mx:Spacer>
+	      <mx:Button label="Cancel" click="dispatchEvent(new Event('cancel'));"/>
+		<mx:Spacer width="33%">		
+		</mx:Spacer>		
+		</mx:HBox>	
+  	</mx:VBox>
+	</mx:Canvas> 
+</mx:Panel>

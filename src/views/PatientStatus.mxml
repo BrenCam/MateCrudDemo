@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" width="100%"
+	title="Patient Status - Click on a row to navigate to selected Patient Record "   xmlns:local="components.*">			
+	<mx:VBox width="100%" height="100%">
+		<mx:DataGrid dataProvider="{ptStatusList}" paddingTop="0" paddingBottom="0" height="100%" 
+			 itemClick="ptSelected(event)" verticalAlign="middle" >
+			<mx:columns>
+				<mx:DataGridColumn headerText="Patient ID" dataField="ptid"/>
+				<mx:DataGridColumn headerText="Last Name" dataField="lastname"/>
+				<local:BackgroundColorColumn headerText="PSA (30)" dataField="psalast" threshhold="30" 
+					itemRenderer="BackgroundColorRenderer" threshholdColor="0xFF0000"/>																							
+				<local:BackgroundColorColumn headerText="Surgery (365)" dataField="surgery" threshhold="365"  id="surgerycol"
+					itemRenderer="BackgroundColorRenderer" threshholdColor="0xFFFF00"/>	
+				<local:BackgroundColorColumn headerText="FollowUp (90)" dataField="fulast" threshhold="90" 
+					itemRenderer="BackgroundColorRenderer" threshholdColor="0xFF0000"/>				
+				<local:BackgroundColorColumn headerText="Biopsy (180)" dataField="bxlast" threshhold="180" 
+					itemRenderer="BackgroundColorRenderer" threshholdColor="0xFFFF00"/>																							
+			</mx:columns>
+		</mx:DataGrid>
+				
+	</mx:VBox>
+		
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.ListEvent;
+			import mx.controls.Alert;
+            import mx.events.CloseEvent;
+            import mx.validators.Validator;
+
+            import events.*;
+            import components.*;
+			import vos.PtStatusVO;
+			import vos.PatientVO;
+            
+            [Bindable]
+            public var ptStatusList:ArrayCollection = null;
+									
+			// navigate to Pt Registration when valid Patient Selected
+			public function ptSelected(event:ListEvent): void{
+			// Make sure a row is clicked
+				if (event.rowIndex >=0) {			
+					// broadcast an event that contains the selectedItem from the List
+					// Populate & Broadcast Status event here - let manager deal with any additional Pt Dtl display rqmnts
+					var evt:PtStatusEvent = new PtStatusEvent(PtStatusEvent.SELECT);
+					evt.ptStatus= new PtStatusVO();
+					evt.ptStatus.id = event.currentTarget.selectedItem.id;
+					evt.ptStatus.ptid = event.currentTarget.selectedItem.ptid;
+					evt.ptStatus.bxlast = event.currentTarget.selectedItem.bxlast;
+					evt.ptStatus.fulast = event.currentTarget.selectedItem.fulast;
+					evt.ptStatus.psalast = event.currentTarget.selectedItem.psalast;
+					evt.ptStatus.surgery = event.currentTarget.selectedItem.surgery; 
+					evt.ptStatus.lastname = event.currentTarget.selectedItem.lastname; 				
+					//var evt:PatientEvent = new PatientEvent(PatientEvent.SELECT);
+					//evt.patient = new Patient();
+					//evt.patient.id = event.currentTarget.selectedItem.id;
+					//evt.patient.lastname = event.currentTarget.selectedItem.lastname;				
+					//evt.patient.firstname = event.currentTarget.selectedItem.firstname;
+					//evt.patient.email = event.currentTarget.selectedItem.email;
+					//evt.patient.dob = event.currentTarget.selectedItem.dob					
+					this.dispatchEvent(evt);
+   				}
+   			}
+			
+		]]>
+	</mx:Script>		
+</mx:Panel>

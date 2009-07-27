@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute"
+    creationComplete="initApp()">
+    <mx:Script>
+      <![CDATA[
+        import mx.collections.XMLListCollection;
+       
+        [Bindable] private var treeData:XML =
+            <root>
+                <node label="Monkeys">
+                    <node label="South America">
+                        <node label="Coastal"/>
+                        <node label="Inland"/>
+                    </node>
+                    <node label="Africa" isBranch="true"/>
+                    <node label="Asia" isBranch="true"/>
+                </node>
+                <node label="Sharks">
+                    <node label="South America" isBranch="true"/>
+                    <node label="Africa" isBranch="true"/>
+                    <node label="Asia" >
+                        <node label="Coastal"/>
+                        <node label="Inland"/>
+                    </node>
+                </node>
+            </root>;
+     
+        private function initApp():void
+        {
+            var nodeList:XMLListCollection = myTree.dataProvider as XMLListCollection;
+            var nodes:XMLList = nodeList.source;
+            expandSubNodes(nodes);
+        }
+       
+        private function expandSubNodes(nodes:XMLList):void
+        {
+            for(var i:int = 0 ; i < nodes.length() ; i++)
+            {
+                var n:XML = nodes[i];
+                if(n.children() != null)
+                {
+                    myTree.expandItem(n,true,false);
+                    expandSubNodes(n.children());
+                }
+                else
+                {
+                    break;
+                }
+            }           
+        }
+      ]]>
+    </mx:Script>
+    <mx:Tree id="myTree" y="50" width="221" height="257" horizontalCenter="0"
+        dataProvider="{treeData.node}" labelField="@label"/>   
+</mx:Application>

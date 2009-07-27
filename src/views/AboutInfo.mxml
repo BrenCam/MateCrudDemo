@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" width="100%"
+	title="Flex/Mate Crud Demo Application - Version 1.1 - 12/09/2008" >
+			
+	<!-- GUI ______________________________________________________________________ -->
+	<mx:Text id="aboutText" width ="650" condenseWhite="true" enabled="true" >
+		<mx:htmlText>
+			<![CDATA[
+<b>About this demo
+</b>
+<br/>
+This is a demo of a CRUD (Create/Update/Delete) database application that I have created using Flex and the Mate framework. 
+I created this demo to explore the process of converting a (non trivial) client/server app to an equivalent RIA/Web version.
+ In my Flex research I found quite a few demos available online. 
+ While many of these demonstrate specific Flex features, they did not address the greater needs of a real world application front end 
+ (e.g. multi form navigation, logon, logoff, interaction between forms, popup forms etc). (FWIW - Wiring all the application components together is quite challenging).
+ This demo is designed to address these issues and to provide the look and feel of a more complete CRUD application. 	
+	<br/>
+	<br/><b>Note:</b> This is a stand alone demo (it does not require a back end database) - the data is managed 
+	entirely in memory using array collections that are initialized at startup. 
+	While you can add, modify and delete data, note that all changes will be lost when you leave. 
+	(A future version may use a real database - but for learning purposes I have kept things simple).<br/>
+	<br>
+	<b>Features to Explore:</b>
+	</br>
+	<li>General - Use of Nested ViewStacks to handle logon/logoff and overall application navigation</li>
+	<li>Logon/Logoff- Nothing is displayed to the user until a successful logon is completed</li>
+	<li>Patient Registration - Form View includes a custom datagrid showing current patient status</li>
+	<li>Patient Registration - Use of Custom Combo Control to auto display drop down values from underlying data</li>
+	<li>Main Menu  - Click anywhere on a menu tree item to select - not just the disclosure icon</li>
+	<li>Search Forms - Use of Popup forms to search/select data from lists</li>
+	<li>Status Form - Custom rendering in a data grid to highlight data that meets specific criteria (e.g. stale data)</li>
+	<li>Update Log - Update log is automatically created when data is added or updated - the   
+	changes are visible in the 'View Update Log' form. To see this in action update a record and then select the update log view. </li>
+	<li>Other/General - Extensive use of the Mate Framework (Injection, Custom Events etc) to keep views in sync as user selections change.
+	Confirmation messages are displayed after database updates.</li>
+	<br/>
+	<b>Comments/Questions/Feedback:</b>	
+	<br/>
+	All feedback is appreciated - if you have comments or questions send me an email at brencam@gmail.com.
+			]]>
+		</mx:htmlText>
+	</mx:Text>
+</mx:Panel>

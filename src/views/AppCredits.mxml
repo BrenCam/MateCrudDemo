@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" width="30%"
+	title="Flex/Mate Crud Demo - Developer Credits " >
+			
+  <mx:Metadata>
+    [Event(name="cancel", type="flash.events.Event")]
+  </mx:Metadata>
+  			
+	<!-- GUI ______________________________________________________________________ -->
+	<mx:VBox horizontalAlign="center">
+		<mx:Label text = "Created by Brendan Campbell" ></mx:Label>
+		<mx:Label text = "Version 1.0 - 12/4/2008"></mx:Label>
+		<mx:Label text = "Questions/Comments - email: brencam@gmail.com"></mx:Label>
+       <mx:Button label="Cancel" click="dispatchEvent(new Event('cancel'));"/>
+	</mx:VBox>
+</mx:Panel>

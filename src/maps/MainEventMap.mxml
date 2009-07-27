@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EventMap xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="http://mate.asfusion.com/" >
+<Debugger level="{Debugger.ALL}"/>
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.events.*;
+			import events.*;
+			import business.*;
+			import com.asfusion.mate.events.UnhandledFaultEvent;
+		]]>
+	</mx:Script>
+
+	<!--
+   <EventHandlers type="{UnhandledFaultEvent.FAULT}">
+      <MethodInvoker generator="{AuthorizationManager}" method="handleFault" arguments="{event.fault}" />
+   </EventHandlers>	
+	-->
+	
+	<!-- FlexEvent.PREINITIALIZE __________________________________________________________________ -->
+	
+	<EventHandlers type="{FlexEvent.PREINITIALIZE}">
+		<ObjectBuilder generator="{AuthorizationManager}" constructorArguments="{scope.dispatcher}" />
+	</EventHandlers>
+	
+	<!-- FlexEvent.APPLICATION_COMPLETE ___________________________________________________________ -->
+	<!--
+	<EventHandlers type="{FlexEvent.APPLICATION_COMPLETE}">
+	-->
+	<!-- FlexEvent.LOGON_COMPLETE (alternative)____________________________________________________ -->
+	
+	<EventHandlers type="{LoginEvent.LOGIN_SUCCESSFUL}">		
+		<HTTPServiceInvoker instance="{patientsService}">
+			<resultHandlers>
+				<MethodInvoker generator="{PatientParser}" 
+					method="loadPatientsFromXML" arguments="{resultObject}" />				
+				<MethodInvoker generator="{PatientManager}" method="savePatientList" arguments="{lastReturn}" />	
+			</resultHandlers>
+			<!--
+			<faultHandlers>
+				 Report http service errors - see generic fault handler instead
+				<MethodInvoker generator="{PatientParser}" 
+					method="handleError" arguments="{resultObject}" />				
+				 
+			</faultHandlers>
+			-->
+		</HTTPServiceInvoker>
+
+		<HTTPServiceInvoker instance="{statusService}">
+			<resultHandlers>
+				<MethodInvoker generator="{PtStatusParser}" 
+					method="loadStatusFromXML" arguments="{resultObject}" />					
+				<MethodInvoker generator="{PtStatusManager}" method="saveStatusList" arguments="{lastReturn}" />	
+			</resultHandlers>
+		</HTTPServiceInvoker>
+		
+		<!--		
+		-->		
+		<HTTPServiceInvoker instance="{psaService}">
+			<resultHandlers>
+				<MethodInvoker generator="{PtPSAParser}" 
+					method="loadPSAFromXML" arguments="{resultObject}" />					
+				<MethodInvoker generator="{PtPSAManager}" method="savePSAList" arguments="{lastReturn}" />	
+			</resultHandlers>
+		</HTTPServiceInvoker>		
+	
+		<HTTPServiceInvoker instance="{logService}">
+			<resultHandlers>
+				<MethodInvoker generator="{UpdateLogParser}" 
+					method="loadLogFromXML" arguments="{resultObject}" />					
+				<MethodInvoker generator="{UpdateLogManager}" method="saveLogList" arguments="{lastReturn}" />	
+			</resultHandlers>
+		</HTTPServiceInvoker>		
+	
+	</EventHandlers>
+				
+	<!-- LoginEvent.LOGIN ________________________________________________________________________ -->
+	
+	<!-- Loging in, normally this would send a server request, but we are making it simple here  -->
+	<EventHandlers type="{LoginEvent.LOGIN}">
+		<MethodInvoker generator="{AuthorizationManager}" method="login" arguments="{[event.username, event.password]}" />
+		
+		<!-- Because there is no server request, we just send the response right away. Normally, we would do this
+		inside the resultSequence -->
+		<ResponseAnnouncer type="loginResultResponse">
+			<Properties loginResult="{lastReturn}"/>
+		</ResponseAnnouncer>
+	</EventHandlers>
+		
+
+	<!-- LoginEvent.LOGOUT _________________________________________________________________________ -->
+	<EventHandlers type="{LoginEvent.LOGOUT}">
+		<MethodInvoker generator="{AuthorizationManager}" method="logout" />
+	</EventHandlers>
+	
+	<!-- ======================================================================================== -->
+	<!-- Services   Note: you can have an external file if you have more services -->
+	<!-- _________________________________________________________________________________________ -->
+	
+	<mx:HTTPService id="patientsService" url="./data/patients.xml" resultFormat="e4x" />
+
+	<mx:HTTPService id="statusService" url="./data/status.xml" resultFormat="e4x" />
+	
+	<mx:HTTPService id="psaService" url="./data/psa.xml" resultFormat="e4x" />
+	
+	<mx:HTTPService id="logService" url="./data/updatelog.xml" resultFormat="e4x" />
+	
+</EventMap>

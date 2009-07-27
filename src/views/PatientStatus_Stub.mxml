@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" width="100%"
+	title="Patient Status - Stale Data is shown in red or yellow "  >			
+	<mx:VBox width="100%" height="100%">
+		<mx:Button label="&lt;&lt; Home" />
+		<mx:DataGrid  paddingTop="0" paddingBottom="0" height="100%" 
+			  verticalAlign="middle" >
+			<mx:columns>
+				<mx:DataGridColumn headerText="Patient ID" dataField="ptid"/>
+				<mx:DataGridColumn headerText="Last Name" dataField="lastname"/>
+			</mx:columns>
+		</mx:DataGrid>				
+	</mx:VBox>			
+</mx:Panel>

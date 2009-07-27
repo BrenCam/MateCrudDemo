@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" 
+  title="Enter Search Criteria or Select Patient From List"
+  creationComplete="getList()">
+
+  <mx:Metadata>
+    [Event(name="search", type="events.SearchEvent")]
+    [Event(name="cancel", type="flash.events.Event")]
+  </mx:Metadata>
+  
+  <mx:Script>
+    <![CDATA[
+    	import mx.core.Application;
+    	import mx.events.ListEvent;
+      import events.*;
+      import vos.*
+      
+      import mx.controls.Alert;
+      import mx.rpc.http.HTTPService;
+      import mx.rpc.events.ResultEvent;
+      import mx.rpc.events.FaultEvent;
+      import mx.collections.ArrayCollection;
+      import com.asfusion.mate.events.Dispatcher;
+
+      import mx.events.ItemClickEvent;
+      
+	  private var httpSvc:HTTPService;
+	  [Bindable]
+	  public var myData:ArrayCollection;
+	  
+	  private var selectedName:String = "lastname";
+	  //private var selectedName:String = "mrn";
+ 
+    
+      public function setInitialFocus():void
+      {
+        //userInput.setFocus();        
+      }
+                 
+      
+      public function getList():void {
+
+    	var httpSvc:HTTPService = new HTTPService();
+        httpSvc.url= "data/patients.xml";        	
+        //httpSvc.method = "POST";
+        
+        httpSvc.addEventListener("result", httpResult);
+        httpSvc.addEventListener("fault", httpFault);
+        httpSvc.send();       
+    	}
+    	
+		public function ptSelected(event:ListEvent): void{
+			// Pass Selection info to main form via Custom event
+			
+			var ptname:String = ptSum.selectedItem.lastname.toString();	  // this works						
+			//Alert.show('DataGrid Clicked - Selected Patient ' + ptname);
+
+			// Make sure a row is clicked
+			if (event.rowIndex >=0) {			
+				// Populate and Dispatch Custom Event; Exit this form 
+		        var evt:PatientEvent = new PatientEvent (PatientEvent.SELECT);
+				evt.patient= new PatientVO();		        
+		        evt.patient.id = ptSum.selectedItem.id.toString();	        
+		        evt.patient.lastname = ptSum.selectedItem.lastname.toString();
+		        evt.patient.firstname = ptSum.selectedItem.firstname.toString();
+		        evt.patient.mrn= ptSum.selectedItem.mrn.toString();
+		        //evt.patient.dob = ptSum.selectedItem.dob.toString();
+		        evt.patient.dob = new Date(ptSum.selectedItem.dob);		        
+		        evt.patient.email = ptSum.selectedItem.email;
+		        evt.patient.famHist = ptSum.selectedItem.famHist;
+		        evt.patient.famHistFather = ptSum.selectedItem.famHistFather ;
+		        evt.patient.famHistBrother = ptSum.selectedItem.famHistBrother ;
+		        
+				// Notes - 11/24/2008 - (After much testing) 
+				// 2 separate events (Update Model + Close Popup) are required here
+				// Order is important - datamodel update must occur first
+				// (otherwise the calling (detail display screen) is not updated				
+				// Event used to trigger updates to data models			
+	    	    dispatchEvent(evt);	
+	    	    // Event used to close popup
+	    	    dispatchEvent(new Event('ok')); 
+		    	    	    	    	
+   			}				
+		}
+    	    	
+ 		public function httpResult(event:ResultEvent):void {
+ 			//Alert.show("httpResult: ");
+            var obj:PatientVO;
+			//myData = event.result.patients.row;
+			//myData = event.result.patients.patient;		// Get from initial data load				
+			searchField.setFocus();			
+						                       
+            // Populate VO with result - 
+//        	for (var i:int=0; i< myData.length; i++) {
+//        		obj = new Patient(myData.getItemAt(i));
+//        			myData.setItemAt(obj,i)
+//        	}
+        	return;
+        	        	        	
+        }
+       
+	  public function httpFault(event:FaultEvent):void {			
+			Alert.show("fault: "+ event.toString());		
+		}//end function faultHandler
+		
+		
+	// Code to support filtering Array Collection data	
+     public function filter():void {              
+           myData.filterFunction = filterFirst;
+           myData.refresh();            
+    	}
+    	
+     public function filterReset():void {                
+           myData.filterFunction = null;
+           myData.refresh();            
+    	}    	
+    			   
+     private function filterFirst(item:Object):Boolean {
+    	    return item[selectedName].match(new RegExp(searchField.text, 'i'))
+    	}	
+
+
+    private function search():void
+    {
+        if(searchField.text !='')
+        {
+            filter()
+        }
+        else
+        {
+            filterReset()
+        }
+    }   
+    
+    private function handleCard(event:ItemClickEvent):void {               
+           selectedName = event.currentTarget.selectedValue as String;                                  
+    }     	
+           
+    private function eraseText(event:MouseEvent):void    {
+        searchField.text ='';
+	    }    		
+               
+    ]]>
+  </mx:Script>
+  
+  	<!-- Listeners and Dispatchers - Needed for PopUp??  _______________________________
+	
+	<mate:Dispatcher id="popUpDispatcher" generator="{PatientEvent}" type="{PatientEvent.SELECT}">
+		<mate:ResponseHandler  type="loginResultResponse" response="checkLoginResult(event.loginResult)" />
+		<mate:eventProperties>
+			<mate:EventProperties  username="{username.text}" password="{password.text}" />
+		</mate:eventProperties>
+	</mate:Dispatcher>
+	
+   -->
+    
+  	<mx:Canvas label="Summary" width="100%" height="100%">
+  	<mx:VBox>
+  		<mx:HBox width="100%">
+			<mx:TextInput id="searchField" width="100%" change="search()" 
+				toolTip="Filter By Name or MRN"
+				text="Search By Name or MRN" rollOver="eraseText(event)">				
+			</mx:TextInput>  
+	        <mx:RadioButtonGroup id="nameGroup"  itemClick="handleCard(event)"/>
+    	    <mx:RadioButton tabEnabled="true" tabIndex="2" label="name" selected="true" groupName="nameGroup"/>
+        	<mx:RadioButton tabEnabled="true" tabIndex="3" label="mrn"  groupName="nameGroup" />
+        	<mx:Button tabEnabled="true" tabIndex="4" click="searchField.text='';search()"   label="Reset" />									
+  		</mx:HBox> 		
+		<mx:DataGrid id ="ptSum" width="100%" height="100%" dataProvider="{myData}" itemClick="ptSelected(event)">
+		<mx:columns>
+			<mx:DataGridColumn dataField="id" headerText="ID" visible="false"/>
+	        <mx:DataGridColumn dataField="lastname" headerText="Last Name"/>
+	        <mx:DataGridColumn dataField="firstname" headerText="First Name"/>
+	        <mx:DataGridColumn dataField="mrn" headerText="MRN"/>
+	        <mx:DataGridColumn dataField="ethnicity" headerText="Ethnicity"/>	        
+	        <mx:DataGridColumn dataField="dob" headerText="Date Of Birth"/>
+		</mx:columns>
+		</mx:DataGrid>
+		<mx:HBox>
+		<mx:Spacer width="33%">		
+		</mx:Spacer>
+	      <mx:Button label="Cancel" click="dispatchEvent(new Event('cancel'));"/>
+		<mx:Spacer width="33%">		
+		</mx:Spacer>		
+		</mx:HBox>	
+  	</mx:VBox>
+	</mx:Canvas> 
+</mx:Panel>

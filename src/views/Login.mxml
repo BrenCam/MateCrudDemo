@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" 
+	xmlns:mate="http://mate.asfusion.com/" 
+			title="Crud Demo Login - V1.13 12/9/2008"  x="300" y="100">
+
+<!--
+	horizontalAlign="center" title="Login" >
+	title="Login"  horizontalAlign="center" >
+		title="Login"  x="300" y="100">
+-->
+	<mx:Script>
+	    <![CDATA[
+	    	import mx.core.UIComponent;
+	    	import mx.validators.Validator;
+	    	import events.LoginEvent;
+	    	import mx.events.ValidationResultEvent;
+			
+			// mutate the loginBtn's click event into a cairngorm event			
+			private function loginUser() : void 
+			{
+				if (Validator.validateAll(validators).length == 0 )
+				{
+					// if everything validates, broadcast an event containing the username & password
+					loginDispatcher.generateEvent();
+				}
+			}
+			private function checkLoginResult(result:Boolean):void 
+			{
+				if (!result) {
+					//show invalid login message
+					currentState = 'messageState';
+				}
+				else 
+				{
+					//successful login
+					// clear all fields otherwise they'll still be populated whenever the user returns here
+					currentState = '';
+					username.text ='';
+					username.errorString = '';
+					password.text = '';
+					password.errorString = '';					
+				}
+			}
+	    ]]>
+	</mx:Script>
+
+
+	<!-- Listeners and Dispatchers ______________________________________________________________________ -->
+	
+	<mate:Dispatcher id="loginDispatcher" generator="{LoginEvent}" type="{LoginEvent.LOGIN}">
+		<mate:ResponseHandler  type="loginResultResponse" response="checkLoginResult(event.loginResult)" />
+		<mate:eventProperties>
+			<mate:EventProperties  username="{username.text}" password="{password.text}" />
+		</mate:eventProperties>
+	</mate:Dispatcher>
+	
+	<!-- GUI ______________________________________________________________________ -->
+	
+	<mx:Form id="loginForm" defaultButton="{ loginBtn }">
+	  	<mx:FormItem label="Username:" required="true">
+	   		<mx:TextInput id="username"  text="MATE" enter="loginUser()"/>
+	   	</mx:FormItem>
+	   	<mx:FormItem label="Password:" required="true" >
+	   		<mx:TextInput id="password" displayAsPassword="true" text="Flex" enter="loginUser()"/>
+	   	</mx:FormItem>
+	   	<mx:FormItem direction="horizontal" verticalGap="15" paddingTop="20">
+	   		<mx:Button id="loginBtn" label="Login" click="loginUser()"/>
+	   	</mx:FormItem>
+	</mx:Form>
+	<mx:Label htmlText="Username: MATE Password: Flex" width="100%"/>
+
+	
+	<!-- Validators ______________________________________________________________________ -->
+	
+	<mx:Array id="validators">
+		<mx:StringValidator id="vUsername" source="{ username }" property="text" required="true"/>
+	    <mx:StringValidator id="vPassword" source="{ password }" property="text" required="true"/>
+	</mx:Array>
+	
+	
+	<!-- States ______________________________________________________________________ -->
+	
+	<mx:states>
+		<mx:State name="messageState">
+			<mx:AddChild relativeTo="{loginForm}" position="before">
+				<mx:Text text="Invalid login information, please try again"/>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+
+</mx:Panel>

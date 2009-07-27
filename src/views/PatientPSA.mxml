@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" width="100%" height="100%"
+	xmlns:vos="vos.*" xmlns:mate="http://mate.asfusion.com/"
+	xmlns:local="components.*"
+	title="PSA Maintenance for: {selectedPatient.lastname},{selectedPatient.firstname} " xmlns:model="model.*">
+	
+<mx:Script>
+	<![CDATA[
+		import mx.controls.Text;
+			import mx.collections.ArrayCollection;
+	    	import mx.events.ValidationResultEvent;
+			import mx.controls.Alert;
+            import mx.events.CloseEvent;
+            import events.*;
+            import mx.validators.Validator;
+			import vos.PatientPSAVO;
+			import vos.PatientVO;
+			import mx.controls.CheckBox;
+			import components.BindableComboBox;	
+			import vos.YNUVO;
+			
+			// For search/popup			
+			import mx.managers.PopUpManager;
+			
+			[Bindable]
+			public var selectedPatient:PatientVO;
+			
+			[Bindable]
+			public var selectedPSA:PatientPSAVO;
+			
+            [Bindable]
+            public var PtPSAList:ArrayCollection = null;
+            
+            //??Replace this with method call that also resets/clears i/p data fields
+            [Bindable]
+            public var updateConfirmation:String;
+            
+            private var popupSearch:PSASearch;
+            private var popupPtSearch:PatientSearch;
+            
+		// Display Find/Search Popup here			
+			private function findPSA():void{
+
+				//Alert.show("Show Search PopUp");				
+				this.updateConfirmation = "";			//Clear prev conf msg			
+				popupSearch = new PSASearch();
+				popupSearch.addEventListener('ok', selectPSAHandler);				
+				popupSearch.addEventListener('cancel', cancelsearchPSAHandler);
+				PopUpManager.addPopUp(popupSearch,this,true);
+				PopUpManager.centerPopUp(popupSearch);
+			}	
+			
+			private function cancelsearchPSAHandler(event:Event):void{
+				PopUpManager.removePopUp(popupSearch);					
+			}			
+			
+			private function selectPSAHandler(event:Event):void{
+				
+				PopUpManager.removePopUp(popupSearch);
+				this.submit.enabled = true;	
+				this.btnDelete.enabled = true;
+			}		
+			
+			// mutate the back button's click event
+			private function cancelPSAEdits() : void 
+			{
+				var event:PtPSAEvent = new PtPSAEvent(PtPSAEvent.CANCEL_EDIT);
+				event.patientPSA = selectedPSA;					
+				this.dispatchEvent(event);
+			}			
+					
+			// the delete button's click event is an Alert asking them to verify the delete
+			// the Alert's closeHandler is directed here to be mutated into a cairngorm event if the answer was OK
+			private function deletePSA( cEvent:CloseEvent ) : void {
+				// was the Alert event an OK
+				if ( cEvent.detail == Alert.OK ) {
+                	// broadcast the event
+					var event:PtPSAEvent = new PtPSAEvent (PtPSAEvent.DELETE);
+					event.patientPSA =  selectedPSA;					
+					this.dispatchEvent(event);
+					// Clear out screen data - ??Better to do this via Setter/Getter method call
+					this.psaDate.text = "";
+ 					this.psaValue.text = ""
+ 					this.submit.enabled = false;
+ 					this.btnDelete.enabled = false;
+				}
+			}	
+			
+			// mutate the add new Patient button's click event
+			public function addNewPSA() : void 
+			{
+				//var event:PtPSAEvent = new PtPSAEvent(PtPSAEvent.ADD);								
+				//event.patientPSA = new PatientPSA();
+				//clear all data entry fields - keep Pt ID	
+				if (selectedPatient == null) {
+					Alert.show('Please Select a Patient First');
+					return;
+				}
+				
+				//Check for no Pt Selected condition - ??Alert Error??
+				if (selectedPSA == null) {
+					selectedPSA = new PatientPSAVO();
+				}
+				selectedPSA.id = 0;				// flag new rec				
+				selectedPSA.date = null;
+				selectedPSA.value = null;
+				this.psaDate.text = "";
+				this.psaValue.text = ""
+				this.submit.enabled = true;
+				this.btnDelete.enabled = false;
+				//this.dispatchEvent(event);
+				//clearSelectedPSA();
+			}
+
+			// mutate the submit button's click event
+			private function savePSAEdits():void {
+				// first, validate the fields
+				var results:Array = Validator.validateAll(validators);
+				
+				// if any of the fields were not valid
+				if (results.length > 0) {
+					this.updateConfirmation = "No data changed - Form contains invalid data";			//Display error msg		
+					return;
+				}
+				// to make it here the fields must have been valid
+				// broadcast the event - PSA manager will force save 
+				var event:PtPSAEvent = new PtPSAEvent(PtPSAEvent.SAVE);								
+				event.patientPSA = new PatientPSAVO();
+				event.patientPSA.id = selectedPSA.id;
+				//Populate event with form data
+				event.patientPSA.ptid = int(this.ptID.text.toString());
+				//event.patientPSA.ptid = selectedPatient.id;
+				event.patientPSA.date = this.psaDate.text.toString();
+				event.patientPSA.value = this.psaValue.text.toString();
+				this.dispatchEvent(event);
+				this.submit.enabled = false;
+			}
+						
+						
+	//************************** Find Patient Code **************************************/
+	
+			// Display Find/Search Popup here	- need to remain on current form after search		
+			private function findPatient():void{
+
+				//Alert.show("Show Search PopUp");	
+				this.updateConfirmation = "";			//Clear prev conf msg			
+				popupPtSearch = new PatientSearch();
+				popupPtSearch.addEventListener('ok', searchPtHandler);				
+				popupPtSearch.addEventListener('cancel', cancelPtSearchHandler);
+				PopUpManager.addPopUp(popupPtSearch,this,true);
+				PopUpManager.centerPopUp(popupPtSearch);
+				//}
+			}							
+				
+			private function searchPtHandler(event:Event):void{
+				
+				PopUpManager.removePopUp(popupPtSearch);
+				btnSelectPSA.enabled = true;
+				btnAdd.enabled = true;				
+				// Redirect/Navigate to PSA DETAIL form
+				//var evt:NavigationEvent = new NavigationEvent(NavigationEvent.PSA_DETAIL);
+				//dispatchEvent(evt);
+
+				var evt:PatientEvent = new PatientEvent(PatientEvent.SELECTPSA);
+					evt.patient = selectedPatient;					
+				this.dispatchEvent(evt);
+			} 				
+						
+			private function cancelPtSearchHandler(event:Event):void{
+				PopUpManager.removePopUp(popupPtSearch);					
+			}																		
+								
+	]]>
+</mx:Script>	
+
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:HBox>
+		<mx:Button label="Select Patient" id="btnSelectPt"  click="findPatient()" />		
+		<mx:Button label="Select PSA" id="btnSelectPSA" click="findPSA()" enabled='false'  />
+	</mx:HBox>
+	<mx:Form id='ptPSA'>
+		<mx:FormItem label="Patient ID">
+			<mx:TextInput id="ptID" text="{selectedPatient.id}" enabled="false" />
+		</mx:FormItem>
+		<mx:FormItem label="Last Name">
+			<mx:TextInput id="ptLName" text="{selectedPatient.lastname}" enabled="false" />
+		</mx:FormItem>
+		<mx:FormItem label="PSA Date">
+			<mx:DateField id="psaDate"  text="{ selectedPSA.date}"/>
+		</mx:FormItem>		
+		<mx:FormItem label="PSA Value">
+			<mx:TextInput id="psaValue" text="{ selectedPSA.value}" />
+		</mx:FormItem>	
+		<mx:FormItem direction="horizontal">
+			<mx:Button label="Submit Changes" click="savePSAEdits()" id="submit" enabled="false"/>
+			<mx:Button label="Add New"  click="addNewPSA()" id='btnAdd' enabled='false'/>			
+			<mx:Button label="Delete" enabled="false" id='btnDelete' 
+				click="Alert.show(	'Are you sure you want to delete this Record?',
+									null,
+									Alert.OK | Alert.CANCEL,
+									this,
+									deletePSA,
+									null,
+									Alert.OK );" />
+		</mx:FormItem>									
+	</mx:Form>	
+	
+		<mx:DataGrid dataProvider="{PtPSAList}" paddingTop="0" paddingBottom="0" height="100%" 
+			 verticalAlign="middle"  enabled="false">
+			<mx:columns>
+				<mx:DataGridColumn headerText="ID" dataField="id"/>
+				<mx:DataGridColumn headerText="Patient ID" dataField="ptid"/>
+				<mx:DataGridColumn headerText="PSA Date" dataField="date"/>
+				<mx:DataGridColumn headerText="PSA Value" dataField="value"/>
+			</mx:columns>
+		</mx:DataGrid>
+	<mx:Label id="lblConf" text="{updateConfirmation}"  fontWeight="bold"  color="Red">
+	</mx:Label>
+</mx:VBox>
+
+	<!-- Validators ______________________________________________________________________ -->
+	<mx:Array id="validators">
+	    <mx:StringValidator id="vpsaDate" source="{this.psaDate}" property="text" required="true" />
+	    <mx:StringValidator id="vpsaValue"  source="{this.psaValue}" property="text" required="true" />
+	</mx:Array>
+
+
+</mx:Panel>

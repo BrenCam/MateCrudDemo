@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" width="100%"
+	title="Update History"   xmlns:local="components.*">			
+	<mx:VBox width="100%" height="100%">
+		<mx:DataGrid dataProvider="{updateLogList}" paddingTop="0" paddingBottom="0" height="100%" 
+			  verticalAlign="middle"  enabled="false">
+			<mx:columns>
+				<mx:DataGridColumn headerText="Update ID" dataField="id"/>
+				<mx:DataGridColumn headerText="Update Date/Time " dataField="date" width = "150" labelFunction="dateFunc"/>
+				<mx:DataGridColumn headerText="Record Type" dataField="rectype"/>
+				<mx:DataGridColumn headerText="Update Type" dataField="updatetype"/>
+				<mx:DataGridColumn headerText="Record ID" dataField="recid"/>
+				<mx:DataGridColumn headerText="Updated By" dataField="user"/>
+			</mx:columns>
+		</mx:DataGrid>
+				
+	</mx:VBox>
+	<mx:DateFormatter id="df" formatString="MM/DD/YYYY J:NN:SS"/>
+		
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+            import events.*;
+            import components.*;
+			import vos.UpdateLogVO;
+            
+            [Bindable]
+            public var updateLogList:ArrayCollection = null;
+            
+		private function dateFunc( item:Object, column:DataGridColumn):String
+			{
+				return df.format( item.date);
+			}
+            
+		]]>
+	</mx:Script>		
+</mx:Panel>		

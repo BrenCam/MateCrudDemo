@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (C) 2003-2006 Adobe Macromedia Software LLC and its licensors.
+//  All Rights Reserved. The following is Source Code and is subject to all
+//  restrictions on such code as contained in the End User License Agreement
+//  accompanying this product. If you have received this file from a source
+//  other than Adobe, then your use, modification, or distribution of this file
+//  requires the prior written permission of Adobe.
+//
+//  @author Dean Harmon
+//  @author Mike Nimer
+////////////////////////////////////////////////////////////////////////////////
+-->
+<mx:ComboBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" creationComplete="componentInit()">
+    <mx:Script>
+        <![CDATA[
+            import mx.utils.ObjectUtil;
+            import mx.controls.Alert;
+            
+            [Bindable]
+	        public var valueField:String = "";
+	        
+	        [Bindable]
+	        public var labelFields:Array = [];
+
+			public function componentInit():void
+			{
+				this.labelFunction = renderLabelFunction;
+			}
+			
+			public function renderLabelFunction(item:Object):String 
+			{
+				var result:String = "";
+				if (labelFields.length == 0)
+				{
+					if (labelField != null)
+					{
+						return item[labelField];
+					} else {
+						return item.toString();
+					}
+				} else {
+				
+					for(var i:int=0; i < labelFields.length; i++)
+					{
+						if (i > 0)
+						{
+							result += " ";
+						}
+						 
+						result += item[labelFields[i]];
+					}
+				}
+				return result;
+			}
+
+			override public function set selectedItem(val:Object):void
+			{
+				//Alert.show(valueField +":" +ObjectUtil.toString(val));
+				if( this.valueField != null )
+				{
+					for(var i:int=0; i < this.dataProvider.source.length; i++)
+		            {
+		                var item:Object = this.dataProvider.source[i];
+		                
+		                if( item[valueField] == val )
+		                {
+		                    // if it matches, make it selected.
+		                    this.selectedIndex = i;
+		                    break;                    
+		                }                	
+		            }
+			   }	
+			   else
+			   {
+			   		super.selectedItem(val);
+			   }			
+			}
+			
+			public function get selectedItemValue():Object
+			{
+				if( this.valueField != null && selectedItem != null)
+				{
+					return selectedItem[valueField];
+				} else {
+					return text;
+				}
+			}
+           
+        ]]>
+    </mx:Script>
+</mx:ComboBox>

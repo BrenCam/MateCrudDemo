@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="*" width="100%"
+		xmlns:mate="http://mate.asfusion.com/" 
+	title="Patient List - Search by name or MRN - then click on a row to navigate to selected Patient Record "
+	xmlns:components="components.*">
+
+<mx:Script>
+	<![CDATA[
+	
+	    	import com.asfusion.mate.events.Dispatcher;
+		    import mx.controls.Alert;
+			import mx.collections.ArrayCollection;
+			import mx.events.ListEvent;
+		    import events.*;
+      		import vos.*
+		
+			[Bindable]
+			public var patients:ArrayCollection = null;
+			
+		  	[Bindable]
+		  	//Results of search are returned here - Patient Manager Class will do the search
+	  		public var myData:ArrayCollection;
+			
+			// format the names that are displayed in the List
+			public function properName( dpItem : Object ) : String {
+				return dpItem.lastname + ", " + dpItem.firstname;
+				//return dpItem.lastname + ", " + dpItem.firstname + ", " + dpItem.dob  + ", " + dpItem.email;											
+			}
+			
+			private function dateFunc( item:Object, column:DataGridColumn):String
+			{
+				return df.format( item.dob);
+			}
+			
+			// No data retrieved until search args are entered - search dispatches ??Lookup?? event with search args
+			// Search by retrieving from initial collecetion via either partial MRN or partial name
+			// Results will be injected into the data grid
+			// User selection will transfer to patient demographics screen
+			private function findPatient():void {
+				if (this.searchVal == null) {
+					Alert.show ('Search Value is required');
+					return;
+				}
+				var evt:SearchEvent = new SearchEvent(SearchEvent.SEARCH);
+				evt.searchArgs = new SearchVO();
+				evt.searchArgs.searchtype = 'name';			// default to name search
+				if (searchGroup.selectedValue =='mrn') {
+					evt.searchArgs.searchtype = 'mrn';			// mrn search
+				}
+				// reset to mrn if rb selected  
+				//	evt.searchArgs.searchtype = "mrn";			// default
+				evt.searchArgs.searchvalue = searchVal.text;				
+				dispatchEvent(evt);							
+			}
+			
+			// navigate to Pt Registration when valid Patient Selected
+			public function ptSelected(event:ListEvent): void{
+	
+				// Make sure a row is clicked
+				if (event.rowIndex >=0) {			
+					// Populate and Dispatch Custom Event; Exit this form 
+			        var evt:PatientEvent = new PatientEvent (PatientEvent.SELECT);
+					evt.patient= new PatientVO();		        
+			        evt.patient.id = ptSum.selectedItem.id.toString();	        
+			        evt.patient.lastname = ptSum.selectedItem.lastname.toString();
+			        evt.patient.firstname = ptSum.selectedItem.firstname.toString();
+			        evt.patient.mrn= ptSum.selectedItem.mrn.toString();
+			        evt.patient.dob = new Date(ptSum.selectedItem.dob);		        
+//			        evt.patient.email = ptSum.selectedItem.email;
+			        evt.patient.famHist = ptSum.selectedItem.famHist;
+//			        evt.patient.famHistFather = ptSum.selectedItem.famHistFather ;
+//			        evt.patient.famHistBrother = ptSum.selectedItem.famHistBrother ;			        
+		    	    dispatchEvent(evt);	 
+		    	    
+		    	    // Create separate event to navigate to detail screen
+					//var mateDispatcher:Dispatcher = new Dispatcher();
+			        var evtnav:NavigationEvent = new NavigationEvent (NavigationEvent.PATIENT_REGISTER);
+					//mateDispatcher.dispatchEvent(evtnav);
+					dispatchEvent(evtnav);
+
+		    	    //mateDispatcher.generateEvent(
+		    	    //navigateDispatcher.generateEvent();	 
+							    	    
+	   			}
+   			}
+		
+	]]>
+</mx:Script>
+
+	<!-- GUI ______________________________________________________________________ -->
+	<!--
+	<mx:List id="Patients_li" 
+		dataProvider="{patients}" 
+		labelFunction="properName"
+		width="100%"  height="100%"/>
+        	<components:ButtonCR tabEnabled="true" tabIndex="4" clickCR="findPatient(event)"   label="Search" />	
+	-->	
+	 	<mx:VBox defaultButton="{btnSearch}">
+	  	<mx:HBox width="100%">
+			<mx:TextInput id="searchVal" width="100%"  
+				toolTip="Search By Last Name or MRN"
+				text="Search By Last Name or MRN" >				
+			</mx:TextInput>  
+	        <mx:RadioButtonGroup id="searchGroup"  />
+    	    <mx:RadioButton tabEnabled="true" tabIndex="2" label="name" selected="true" groupName="searchGroup"/>
+        	<mx:RadioButton tabEnabled="true" tabIndex="3" label="mrn"  groupName="searchGroup" />
+        	<mx:Button tabEnabled="true" tabIndex="4" click="findPatient()" id="btnSearch"  label="Search" />	
+        	     								
+  		</mx:HBox> 	
+		<mx:DataGrid id ="ptSum" width="100%" height="100%" dataProvider="{myData}" itemClick="ptSelected(event)">
+		<mx:columns>
+			<mx:DataGridColumn dataField="id" headerText="ID" visible="false"/>
+	        <mx:DataGridColumn dataField="lastname" headerText="Last Name"/>
+	        <mx:DataGridColumn dataField="firstname" headerText="First Name"/>
+	        <mx:DataGridColumn dataField="mrn" headerText="MRN"/>
+	        <mx:DataGridColumn dataField="famHist" headerText="Family History"/>
+	        <mx:DataGridColumn dataField="ethnicity" headerText="Ethnicity"/>	        
+	        <mx:DataGridColumn dataField="dob" headerText="Date Of Birth" width = "150" labelFunction="dateFunc" />
+		</mx:columns>
+		</mx:DataGrid>	
+		</mx:VBox>
+		<mx:DateFormatter id="df" formatString="MM/DD/YYYY "/>
+</mx:Panel>

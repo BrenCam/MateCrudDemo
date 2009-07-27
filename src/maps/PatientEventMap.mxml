@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EventMap xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="http://mate.asfusion.com/" >
+<Debugger level="{Debugger.ALL}"/>
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.events.*;
+			import events.*;
+			import business.*;
+		]]>
+	</mx:Script>
+	
+			
+	<!-- patientEvent.SELECT _____________________________________________________________________ -->
+	
+	<EventHandlers type="{PatientEvent.SELECT}" debug="true">
+		<MethodInvoker generator="{PatientManager}" method="selectPatient" arguments="{event.patient}"/>
+		<MethodInvoker generator="{PtStatusManager}" method="selectStatus" arguments="{event.patient}"/>
+		<MethodInvoker generator="{PtPSAManager}" method="filterPSA" arguments="{event.patient}"/>
+		
+		<!-- assume everything was ok, navigate to patient registration form -->
+		<!-- 12/3/08 - remove this - don't always want to do this - ??use separate event handler for navigation?? -->
+<!--		
+		<EventAnnouncer generator="{NavigationEvent}" type="{NavigationEvent.PATIENT_REGISTER}"/>
+-->
+	</EventHandlers>
+	
+	<!-- StatusEvent.SELECT  - Patient Status Selected - handle navigation & reset selected patient and status data -->	
+	<EventHandlers type="{PtStatusEvent.SELECT}" debug="true">
+		<MethodInvoker generator="{PatientManager}" method="resetPatient" arguments="{event.ptStatus}"/>		
+		<MethodInvoker generator="{PtStatusManager}" method="resetStatus" arguments="{event.ptStatus}"/> 
+		<!-- assume everything was ok, navigate to patient registration form -->
+		<EventAnnouncer generator="{NavigationEvent}" type="{NavigationEvent.PATIENT_REGISTER}"/>
+	</EventHandlers>
+	
+	<!-- StatusEvent.ADD____________ Invoke method to add new status rec -->	
+	<EventHandlers type="{PtStatusEvent.ADD}" debug="true">
+
+		<!-- StatusEvent.ADD - Test if this event is fired -->	
+		<MethodInvoker generator="{PtStatusManager}" method="saveStatus" arguments="{event.ptStatus}"/> 
+		
+	</EventHandlers>	
+	
+	<!-- PatientEvent.SAVE _______________________________________________________________________ -->
+	
+	<EventHandlers type="{PatientEvent.SAVE}" debug="true">
+		<MethodInvoker generator="{PatientManager}" method="savePatient" arguments="{event.patient}"/>
+		<!-- assume everything was ok, make patient list show up -->
+		<!--
+		<EventAnnouncer generator="{NavigationEvent}" type="{NavigationEvent.PATIENT_LIST}"/>
+		-->
+	</EventHandlers>
+	
+	<!-- PatientEvent.ADD _________________________________________________________________________ -->
+	
+	<EventHandlers type="{PatientEvent.ADD}">
+		<EventAnnouncer generator="{PatientEvent}" type="{PatientEvent.SELECT}">
+			<Properties patient="{event.patient}"/>
+		</EventAnnouncer>
+	</EventHandlers>	
+	
+	<!-- PatientEvent.DELETE ____________________________________________________________________ -->
+	
+	<EventHandlers type="{PatientEvent.DELETE}">
+		<MethodInvoker generator="{PatientManager}" method="deletePatient" arguments="{event.patient}"/>
+		<!-- assume everything was ok, make patient list show up 
+		<EventAnnouncer generator="{NavigationEvent}" type="{NavigationEvent.PATIENT_LIST}"/>
+		-->
+	</EventHandlers>
+	
+	<!-- SearchEvent.SEARCH  for search/lookup -->
+	<EventHandlers type="{SearchEvent.SEARCH}">
+		<MethodInvoker generator="{PatientManager}" method="searchPatients" arguments="{event.searchArgs}"/>
+	</EventHandlers>
+		
+</EventMap>

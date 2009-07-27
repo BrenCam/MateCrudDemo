@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EventMap xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="http://mate.asfusion.com/" >
+<Debugger level="{Debugger.ALL}"/>
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.events.*;
+			import events.*;
+			import business.*;
+		]]>
+	</mx:Script>
+	
+<!-- PtPSAEvent.SELECT _____( Watch out for case mismatches below )___________________________ -->
+	
+	<EventHandlers type="{PtPSAEvent.SELECT}" debug="true">
+
+		<MethodInvoker generator="{PtPSAManager}" method="selectPSA" arguments="{event.patientPSA}"/>
+		
+		<EventAnnouncer generator="{NavigationEvent}" type="{NavigationEvent.PSA_LIST}"/>
+	</EventHandlers>
+	
+	
+	<!-- PtPSAEvent.SAVE _____( Watch out for case mismatches below )___________________________ -->
+	
+	<EventHandlers type="{PtPSAEvent.SAVE}" debug="true">
+		<MethodInvoker generator="{PtPSAManager}" method="savePSA" arguments="{event.patientPSA}"/>	
+		<!-- Need to refresh filtered list as well here -->
+	</EventHandlers>
+	
+	<!-- PSAEvent.CANCEL_EDIT __________________________________________________________________ -->
+	
+	<EventHandlers type="{PtPSAEvent.CANCEL_EDIT}">
+		<!-- assume everything was ok, make patient list show up -->
+		<EventAnnouncer generator="{NavigationEvent}" type="{NavigationEvent.PATIENT_LIST}"/>
+	</EventHandlers>
+	
+	
+	<!-- PSAEvent.ADD _________________________________________________________________________ -->
+	
+	<!--
+	<EventHandlers type="{PtPSAEvent.ADD}">
+		<EventAnnouncer generator="{PtPSAEvent}" type="{PtPSAEvent.SELECT}">
+			<Properties patient="{event.patientPSA}"/>
+		</EventAnnouncer>
+	</EventHandlers>
+	-->		
+
+	<!-- PSAEvent.DELETE ____________________________________________________________________ -->
+	
+	<EventHandlers type="{PtPSAEvent.DELETE}">
+		<MethodInvoker generator="{PtPSAManager}" method="deletePSA" arguments="{event.patientPSA}"/>
+	</EventHandlers>
+	
+	
+	<!-- UpdateLogEvent.ADD____ (Move this to own map later ??)  ____________________________ -->
+	
+	<EventHandlers type="{UpdateLogEvent.ADD}" debug="true">
+		<MethodInvoker generator="{UpdateLogManager}" method="addUpdateLog" arguments="{event.updateLog}"/>
+	</EventHandlers>
+	
+			
+</EventMap>

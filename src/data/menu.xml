@@ -1,0 +1,16 @@
+<root xmlns="">
+	<node label="System Administration">
+		<node label="Logon"/>
+		<node label="Patient List"/>
+		<node label="User Maintenance"/>
+	</node>
+	<node label="Data Management">
+		<node label="Registration"/>
+		<node label="Status"/>		
+		<node label="PSA"/>
+	</node>
+	<node label="Reports">
+		<node label="Summary"/>
+		<node label="History"/>
+	</node>
+</root>

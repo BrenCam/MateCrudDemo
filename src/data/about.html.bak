@@ -1,0 +1,29 @@
+<H3>
+About this demo
+</H3>
+
+<P>
+	This is a demo of a CRUD (Create/Update/Delete) database application that I put together using Flex and the Mate framework. I created this demo project to explore the process of converting a (non trivial) client/server app to an equivalent RIA/Web version. 
+</P>
+	In my Flex reasearch I found quite a few Flex demos available online. While many of these demonstrate a specific Flex feature(s), they do not address the needs of a real world application front end (e.g. multi form navigation, logon, logoff, interaction between forms, popup forms etc). This demo includes functionality to address some of those real world requirements. 
+	
+<P/>
+	<b>Note:</b> This is a stand alone demo (you can run it without installing any SQL database) - data is managed in memory - using array collections that are initialized at startup. While you can add and delete data note that all the changes will be lost when you leave. (A future version may use a real database - but for learning purposes I have kept things simple).<br/>
+
+	<H3>
+	Features of Interest:
+	</H3>
+
+	<LI>General - Use of Nested ViewStacks to handle logon/logoff and form navigation</LI>
+	<LI>Patient Registration - Use of Custom Combo Control to auto display drop down values from underlying data.</LI>
+	<LI>Patient Registration - Includes a custom status datagrid showing summary status for the current patient.</LI>
+	<LI>Main Menu  - Click anywhere on an item to select - not just the triangle</LI>
+	<LI>Search Forms - Use of PopUp forms to select from lists</LI>
+	<LI>Summary Form - Custom rendering in a data grid to highlight data that meets specific criteria</LI>
+	<LI>Update Log - Update log automatically created when data is added or updated - changes are visible in the 'View Update Log' form. Try it and see. </LI>
+	<LI>Other/General - Extensive use of the Mate Framework (Injection, Custom Events etc) to keep views in sync as user selections change.</LI>
+	<H3>
+	Comments/Questions/Feedback:
+	</H3>	
+	All feedback is appreciated - if you have comments or questions send me an email at brencam@gmail.com.
+

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EventMap xmlns:mx="http://www.adobe.com/2006/mxml" xmlns="http://mate.asfusion.com/">
+<Debugger level="{Debugger.ALL}"/>
+	
+	<mx:Script>
+		<![CDATA[
+			import business.*;
+			import views.*;
+		]]>
+	</mx:Script>
+	
+	<!-- PatientDetailModel __________________________________________________________________ -->
+	<Injectors target="{PatientDetail}" debug="true" >
+		<PropertyInjector targetKey="selectedPatient" source="{PatientManager}" sourceKey="patient" />
+	</Injectors>
+	
+	<!-- PatientList View __________________________________________________________________ -->
+	<!--
+	-->
+	<Injectors target="{PatientList}">
+		<PropertyInjector targetKey="patients" source="{PatientManager}" sourceKey="patientList" />
+	</Injectors>
+	
+	<!--
+	<Injectors target="{PatientList}" debug="true" >
+		<PropertyInjector targetKey="myData" source="{PatientManager}" sourceKey="patientList" />
+	</Injectors>
+	-->
+	
+	<Injectors target="{PatientList}" debug="true" >
+		<PropertyInjector targetKey="myData" source="{PatientManager}" sourceKey="searchResults" />
+	</Injectors>
+	
+	<!-- showDGStatus_________________________ -->
+	<Injectors target="{PatientDetail}">
+		<PropertyInjector targetKey="showDGStatus" source="{PatientManager}" sourceKey="showDGStatus" />
+	</Injectors>
+	
+	<!-- Create new injector to invoke a the setter method that will set the protection on the family history fields		
+	<Injectors target="{PatientDetail}" debug="true">
+		<PropertyInjector targetKey="famHistFather" source="{PatientManager}" sourceKey="famHistFather" />
+	</Injectors>	
+	
+	<Injectors target="{PatientDetail}" debug="true">
+		<PropertyInjector targetKey="famHistBrother" source="{PatientManager}" sourceKey="famHistBrother" />
+	</Injectors>			
+	-->	
+			
+	<Injectors target="{PatientDetail}" debug="true">
+		<PropertyInjector targetKey="protectFamHist" source="{PatientManager}" sourceKey="famHist" />
+	</Injectors>
+	
+	<!-- Patient Status List Injection __________________________________________________________ -->
+	<Injectors target="{PatientDetail}" debug="true">
+		<PropertyInjector targetKey="ptStatus" source="{PtStatusManager}" sourceKey="ptStatus" />
+	</Injectors>
+	
+	<!-- Status List View -  Inject Status data into patient status summary view _______________ -->
+	
+	<Injectors target="{PatientStatus}" debug="true">
+		<PropertyInjector targetKey="ptStatusList" source="{PtStatusManager}" sourceKey="ptStatusList" />
+	</Injectors>
+	
+	<!-- ?? Also inject new index value into TreeView when selection made on summary screen - keep in synch
+		??How to bind to a treeview variable or index to reset the focus ??
+	 -->
+			
+	<!-- Patient Search  Data Injection  ________________________________________________________ -->
+	
+	<Injectors target="{PatientSearch}" debug="true" >
+		<PropertyInjector targetKey="myData" source="{PatientManager}" sourceKey="patientList" />
+	</Injectors>
+					
+	<!-- Menu Sync Data Injection  - When patient rec selected from list screen -->
+	<Injectors target="{MainUI}" debug="true" > 
+		<PropertyInjector targetKey="setMenuIndex" source="{PatientManager}" sourceKey="selectedIndex" />
+	</Injectors>
+	
+	
+	<!-- PSAList View __________________________________________________________________ -->
+	
+	<!--
+	<Injectors target="{PtPSA}">
+		<PropertyInjector targetKey="PtPSAList" source="{PtPSAManager}" sourceKey="PtPSAList" />
+	</Injectors>
+	-->
+	
+	<Injectors target="{PatientPSA}">
+		<PropertyInjector targetKey="PtPSAList" source="{PtPSAManager}" sourceKey="filteredPSAList" />
+	</Injectors>
+	
+	<!-- PSA DetailModel __________________________________________________________________ -->
+	
+	<!--
+	-->
+	<Injectors target="{PSASearch}" debug="true" >
+		<PropertyInjector targetKey="myData" source="{PtPSAManager}" sourceKey="filteredPSAList" />
+	</Injectors>
+	
+	<Injectors target="{PatientPSA}" debug="true" >
+		<PropertyInjector targetKey="selectedPSA" source="{PtPSAManager}" sourceKey="PtPSA" />
+	</Injectors>
+
+	<Injectors target="{PatientPSA}">
+		<PropertyInjector targetKey="selectedPatient" source="{PatientManager}" sourceKey="patient" />
+	</Injectors>
+
+	<Injectors target="{PatientPSA}">
+		<PropertyInjector targetKey="updateConfirmation" source="{PtPSAManager}" sourceKey="updateConfirmation" />
+	</Injectors>
+	
+	<Injectors target="{PatientDetail}">
+		<PropertyInjector targetKey="updateConfirmation" source="{PatientManager}" sourceKey="updateConfirmation" />
+	</Injectors>
+	
+	<!-- Update Log Data__________________________________________________________________ -->
+	<Injectors target="{UpdateLog}">
+		<PropertyInjector targetKey="updateLogList" source="{UpdateLogManager}" sourceKey="UpdateLogList" />
+	</Injectors>
+			
+</EventMap>

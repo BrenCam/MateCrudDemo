@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    Tree View Navigation Demo using Mate Flex Framework   
+	layout="vertical"
+-->
+
+<mx:Application
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:views="views.*" 
+	xmlns:mate="http://mate.asfusion.com/" 
+	xmlns:maps="maps.*"
+	horizontalAlign="center"
+	verticalAlign="middle"> 	
+	
+<mx:Script>
+	<![CDATA[
+			import events.*;
+			import views.Login;
+			import mx.controls.Alert;
+			
+			private const LOGIN:uint = 0;
+			private const MAIN_UI:uint = 1;
+	]]>
+</mx:Script>	
+
+	<!-- Styles______________________________________________________ -->
+	
+	<mx:Style source="/styles/main.css" />
+	
+	
+	<!-- Event Maps __ Keep Separate maps by function/subfunction  ____ -->
+	
+	<maps:MainEventMap />
+	<maps:PatientEventMap/>	
+	<maps:PSAEventMap/>	
+	<maps:DataInjectionlMap/>
+
+	<!-- Views _______________________________________________________ -->
+	<!--
+	<mx:ViewStack id="viewStackMain" minWidth="900" minHeight="425" borderStyle="solid" >
+	Note: Make outer viewstack h&w = 100%  of avail space 
+	-->
+	<mx:ViewStack id="viewStackMain" width="100%" height="100%" borderStyle="none"  horizontalCenter="">	
+		<views:LoginUI  />
+		<views:MainUI  />
+	</mx:ViewStack>
+
+	<mate:Listener type="{NavigationEvent.LOGIN}" 	receive="viewStackMain.selectedIndex = MAIN_UI" />
+		<!-- Listeners and Dispatchers________________________________________________ -->
+	    <!-- Reselect Login Screen when Logout Event Received -->
+	<mate:Listener type="{NavigationEvent.LOGOUT}" 			receive="viewStackMain.selectedIndex = LOGIN" />
+	<!--
+	-->
+
+</mx:Application>
